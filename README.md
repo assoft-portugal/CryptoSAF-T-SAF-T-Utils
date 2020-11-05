@@ -33,14 +33,6 @@ Neste momento, todas as tags com valores estão a ser cifradas.
 
 `pt.cryptosaft.demo.FastSaftEncrypt [modo] [inputXml] [outputXml] [chave] [iv]`
 
-#### JAR
-
-`java -jar jar/FastSaftEncrypt.jar-jar-with-dependencies.jar E src/main/resources/Exemplo_Facturacao.xml /src/main/resources/CryptoSAFT-Exemplo_Facturacao.xml 8/K97v8vQqbD/ShX5yx+3g== +KSjwLJcoMXl7W+U1y5VtQ==`
-
-#### MAVEN
-
-`mvn compile exec:java -Dexec.mainClass="pt.cryptosaft.demo.FastSaftEncrypt" -Dexec.args="E src/main/resources/Exemplo_Facturacao.xml /src/main/resources/CryptoSAFT-Exemplo_Facturacao.xml 8/K97v8vQqbD/ShX5yx+3g== +KSjwLJcoMXl7W+U1y5VtQ=="`
-
 | Argumento | Descrição | Valores |
 | ------ | ------ | ------ |
 | modo | Modo de operação | `E` - Descaracterização (Encrypt);<br> `D` - Reversão (Decrypt); |
@@ -48,6 +40,14 @@ Neste momento, todas as tags com valores estão a ser cifradas.
 | outputXml | Ficheiro SAF-T de saída | Ex: `saft_desc.xml` |
 | chave | Chave simétrica em formato Base64 | Ex: `8/K97v8vQqbD/ShX5yx+3g==` |
 | iv | Vetor de inicialização em formato Base64 | Ex: `+KSjwLJcoMXl7W+U1y5VtQ==` |
+
+#### JAR
+
+`java -jar jar/FastSaftEncrypt.jar-jar-with-dependencies.jar E src/main/resources/Exemplo_Facturacao.xml /src/main/resources/CryptoSAFT-Exemplo_Facturacao.xml 8/K97v8vQqbD/ShX5yx+3g== +KSjwLJcoMXl7W+U1y5VtQ==`
+
+#### MAVEN
+
+`mvn compile exec:java -Dexec.mainClass="pt.cryptosaft.demo.FastSaftEncrypt" -Dexec.args="E src/main/resources/Exemplo_Facturacao.xml /src/main/resources/CryptoSAFT-Exemplo_Facturacao.xml 8/K97v8vQqbD/ShX5yx+3g== +KSjwLJcoMXl7W+U1y5VtQ=="`
 
 ## FastHashCannon
 
@@ -68,9 +68,14 @@ Este ficheiro canonizado é depois usado para calcular a hash usando SHA-256.
 - Enviar a hash calculada para a saída do executável.
 - Apagar o ficheiro canonizado no final da operação.
 
-#### Execução
+### Execução
 
 `pt.cryptosaft.demo.FastHashCannon [inputXml] [outputXml]`
+
+| Argumento | Descrição | Valores |
+| ------ | ------ | ------ |
+| inputXml | Ficheiro SAF-T de entrada | Ex: `saft.xml` |
+| outputXml | Ficheiro SAF-T canonizado | Ex: `saft_can.xml` |
 
 #### JAR
 
@@ -80,7 +85,14 @@ Este ficheiro canonizado é depois usado para calcular a hash usando SHA-256.
 
 `mvn compile exec:java -Dexec.mainClass="pt.cryptosaft.demo.FastHashCannon" -Dexec.args="/src/main/resources/CryptoSAFT-Exemplo_Facturacao.xml"`
 
-| Argumento | Descrição | Valores |
-| ------ | ------ | ------ |
-| inputXml | Ficheiro SAF-T de entrada | Ex: `saft.xml` |
-| outputXml | Ficheiro SAF-T canonizado | Ex: `saft_can.xml` |
+## Ajuda
+
+Use a secção de [**issues**](https://github.com/assoft-portugal/CryptoSAF-T-SAF-T-Utils/issues) para consultar, colocar questões ou sugestões que gostaria de ver neste repositório.
+
+## Contributos
+
+Temos muito gosto em contar com a sua colaboração neste projeto. Faça Fork deste repositório e envie o seus [**pull requests**](https://github.com/assoft-portugal/CryptoSAF-T-SAF-T-Utils/pulls)!
+
+## Licença
+
+Este projeto está licenciado nos termos [MIT License](https://github.com/assoft-portugal/CryptoSAF-T-SAF-T-Utils/blob/main/LICENSE).
