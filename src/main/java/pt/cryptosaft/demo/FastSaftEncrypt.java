@@ -17,8 +17,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import javax.crypto.Cipher;
@@ -77,32 +75,41 @@ public class FastSaftEncrypt {
 
 		Cipher cipher = cipherInitialization();
 
-		XMLStreamReader xmlr = staxFactoryInitialization(input);
+		XMLInputFactory2 xmlif = staxFactoryInitialization(input);
 
-		Reader reader = readerInitialization(input, CHARSET);
+		XMLStreamReader xmlr = null;
 
-		FileWriter writer = writerInitialization(output, CHARSET);
+		try (InputStream targetStream = new FileInputStream(new File(input));
+				Reader reader = readerInitialization(input, CHARSET);
+				FileWriter writer = writerInitialization(output, CHARSET);) {
 
-		IterationParameters iParam = new IterationParameters();
+			xmlr = xmlif.createXMLStreamReader(targetStream);
 
-		//
-		// Parse the XML
-		//
+			IterationParameters iParam = new IterationParameters();
 
-		while (xmlr.hasNext()) {
-			iParam = processEvent(xmlr, reader, writer, cipher, iParam);
-			xmlr.next();
+			//
+			// Parse the XML
+			//
+
+			while (xmlr.hasNext()) {
+				iParam = processEvent(xmlr, reader, writer, cipher, iParam);
+				xmlr.next();
+			}
+
+			writeToOutput(reader, writer);
+
+			long duration = (System.currentTimeMillis() - start) / 1000;
+			System.out.println("Done in " + duration + " seconds.");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		} finally {
+			//
+			// Close the reader
+			//
+			xmlr.close();
 		}
-
-		writeToOutput(reader, writer);
-
-		//
-		// Close the reader
-		//
-		writer.close();
-		xmlr.close();
-		long duration = (System.currentTimeMillis() - start) / 1000;
-		System.out.println("Done in " + duration + " seconds.");
 
 	}
 
@@ -128,9 +135,9 @@ public class FastSaftEncrypt {
 					iParam.getTree().add(xmlr.getLocalName());
 
 					// System.out.println(iParam.getCurrentBranch());
-					
+
 					iParam.setElementToCipher(elementsToCypher.contains(iParam.getCurrentBranch()));
-					
+
 					iParam.setElementToCipher(true);
 
 				}
@@ -221,7 +228,7 @@ public class FastSaftEncrypt {
 		return reader;
 	}
 
-	private static XMLStreamReader staxFactoryInitialization(String input)
+	private static XMLInputFactory2 staxFactoryInitialization(String input)
 			throws FactoryConfigurationError, FileNotFoundException, XMLStreamException {
 		//
 		// Get an input factory
@@ -234,13 +241,7 @@ public class FastSaftEncrypt {
 
 		xmlif.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, Boolean.FALSE);
 
-		//
-		// Instantiate a reader
-		//
-		File initialFile = new File(input);
-		InputStream targetStream = new FileInputStream(initialFile);
-		XMLStreamReader xmlr = xmlif.createXMLStreamReader(targetStream);
-		return xmlr;
+		return xmlif;
 	}
 
 	private static Cipher cipherInitialization() throws NoSuchAlgorithmException, NoSuchPaddingException,

@@ -1,0 +1,236 @@
+<AuditFile xmlns="urn:OECD:StandardAuditFile-Tax:PT_1.00_01">
+  <Header>
+    <AuditFileVersion>1.00_01</AuditFileVersion>
+    <CompanyID></CompanyID>
+    <TaxRegistrationNumber>123456789</TaxRegistrationNumber>
+    <TaxAccountingBasis>Facturação</TaxAccountingBasis>
+    <CompanyName>Empresa Demonstrativa &amp; de Testes Lda.</CompanyName>
+    <CompanyAddress>
+      <AddressDetail>Avenida das Demonstrações, lote 1 Piso 1</AddressDetail>
+      <City>Parque das Demonstrações</City>
+      <PostalCode>1000-000 Lisboa</PostalCode>
+      <Country>PT</Country>
+    </CompanyAddress>
+    <FiscalYear>2007</FiscalYear>
+    <StartDate>2007-01-01</StartDate>
+    <EndDate>2007-12-31</EndDate>
+    <CurrencyCode>EUR</CurrencyCode>
+    <DateCreated>2007-09-28</DateCreated>
+    <ProductID>Gestão Comercial XPTO</ProductID>
+    <ProductVersion>07.01.0004</ProductVersion>
+    <Telephone>211234567</Telephone>
+    <Fax>211234567</Fax>
+  </Header>
+  <MasterFiles>
+    <Customer>
+      <CustomerID>123456789</CustomerID>
+      <CustomerTaxID>123456789</CustomerTaxID>
+      <CompanyName>Azimute, Lda</CompanyName>
+      <Contact>Carlos Antunes</Contact>
+      <BillingAddress>
+        <AddressDetail>Av.Afonso III - 245 - Loja A</AddressDetail>
+        <City>Alto de São João</City>
+        <PostalCode>1400 LISBOA</PostalCode>
+        <Country>PT</Country>
+      </BillingAddress>
+      <Telephone>219521430</Telephone>
+      <Fax>219521455</Fax>
+      <Email>geral@azimute.pt</Email>
+    </Customer>
+    <Customer>
+      <CustomerID>987654321</CustomerID>
+      <CustomerTaxID>987654321</CustomerTaxID>
+      <CompanyName>Al
+        catifar,
+        Lda</CompanyName>
+      <Contact>Rui Silva</Contact>
+      <BillingAddress>
+        <AddressDetail>Estrada de Benfica 205 -A</AddressDetail>
+        <City>Benfica</City>
+        <PostalCode>1500 LISBOA</PostalCode>
+        <Country>PT</Country>
+      </BillingAddress>
+      <Telephone>217602525</Telephone>
+      <Fax>217602255</Fax>
+    </Customer>
+	<Customer>
+      <CustomerID>100000001</CustomerID>
+      <CustomerTaxID>987654322</CustomerTaxID>
+      <CompanyName>Alcatifar e Filhos, Lda</CompanyName>
+      <Contact>Manuel Ribeiro</Contact>
+      <BillingAddress>
+        <AddressDetail>Estrada de Benfica 400</AddressDetail>
+        <City>Benfica</City>
+        <PostalCode>1500 LISBOA</PostalCode>
+        <Country>PT</Country>
+      </BillingAddress>
+      <Telephone>217602566</Telephone>
+      <Fax>217602567</Fax>
+    </Customer>
+    <Product>
+      <ProductType>O</ProductType>
+      <ProductCode>OT Canetas</ProductCode>
+      <ProductGroup>3 Outros</ProductGroup>
+      <ProductDescription>Canetas</ProductDescription>
+      <ProductNumberCode>OT Canetas</ProductNumberCode>
+    </Product>
+    <Product>
+      <ProductType>P</ProductType>
+      <ProductCode>PR LJ5P</ProductCode>
+      <ProductGroup>1 Hardware</ProductGroup>
+      <ProductDescription>Impressora Laser Jet 5P</ProductDescription>
+      <ProductNumberCode>5609999000043</ProductNumberCode>
+    </Product>
+    <Product>
+      <ProductType>P</ProductType>
+      <ProductCode>PR 720C</ProductCode>
+      <ProductGroup>1 Hardware</ProductGroup>
+      <ProductDescription>Impressora Jet 720C</ProductDescription>
+      <ProductNumberCode>5609999000067</ProductNumberCode>
+    </Product>
+    <TaxTable>
+      <TaxType>
+        <Description>IVACON</Description>
+        <TaxCodeDetails>
+          <TaxCode>Red</TaxCode>
+          <Description>Reduzida</Description>
+          <TaxPercentage>5</TaxPercentage>
+        </TaxCodeDetails>
+        <TaxCodeDetails>
+          <TaxCode>Nor</TaxCode>
+          <Description>Normal</Description>
+          <TaxPercentage>21</TaxPercentage>
+        </TaxCodeDetails>
+        <TaxCodeDetails>
+          <TaxCode>Int</TaxCode>
+          <Description>Intermédia</Description>
+          <TaxPercentage>12</TaxPercentage>
+        </TaxCodeDetails>
+      </TaxType>
+      <TaxType>
+        <Description>IVARAM</Description>
+        <TaxCodeDetails>
+          <TaxCode>Red</TaxCode>
+          <Description>Reduzida</Description>
+          <TaxPercentage>4</TaxPercentage>
+        </TaxCodeDetails>
+        <TaxCodeDetails>
+          <TaxCode>Nor</TaxCode>
+          <Description>Normal</Description>
+          <TaxPercentage>15</TaxPercentage>
+        </TaxCodeDetails>
+        <TaxCodeDetails>
+          <TaxCode>Int</TaxCode>
+          <Description>Intermédia</Description>
+          <TaxPercentage>8</TaxPercentage>
+        </TaxCodeDetails>
+      </TaxType>
+      <TaxType>
+        <Description>IVARAA</Description>
+        <TaxCodeDetails>
+          <TaxCode>Red</TaxCode>
+          <Description>Reduzida</Description>
+          <TaxPercentage>4</TaxPercentage>
+        </TaxCodeDetails>
+        <TaxCodeDetails>
+          <TaxCode>Nor</TaxCode>
+          <Description>Normal</Description>
+          <TaxPercentage>15</TaxPercentage>
+        </TaxCodeDetails>
+        <TaxCodeDetails>
+          <TaxCode>Int</TaxCode>
+          <Description>Intermédia</Description>
+          <TaxPercentage>8</TaxPercentage>
+        </TaxCodeDetails>
+      </TaxType>
+    </TaxTable>
+  </MasterFiles>
+  <SourceDocuments>
+    <SalesInvoices>
+      <NumberOfEntries>2</NumberOfEntries>
+      <TotalDebit>0</TotalDebit>
+      <TotalCredit>615.29</TotalCredit>
+      <Invoice>
+        <InvoiceNo>NFa 1</InvoiceNo>
+        <Period>1</Period>
+        <InvoiceDate>2007-01-24</InvoiceDate>
+        <InvoiceType>Factura</InvoiceType>
+        <SystemEntryDate>2007-01-24T15:37:50</SystemEntryDate>
+        <TransactionID></TransactionID>
+        <CustomerID>123456789</CustomerID>
+        <Line>
+          <LineNumber>1</LineNumber>
+          <ProductCode>PR LJ5P</ProductCode>
+          <ProductDescription>Impressora Laser Jet 5P</ProductDescription>
+          <Quantity>1</Quantity>
+          <UnitOfMeasure>Unid</UnitOfMeasure>
+          <UnitPrice>482.59</UnitPrice>
+          <TaxPointDate>2007-01-24</TaxPointDate>
+          <Description>Impressora Laser Jet 5P</Description>
+          <DebitAmount>0</DebitAmount>
+          <CreditAmount>482.59</CreditAmount>
+          <Tax>
+            <TaxType>IVACON</TaxType>
+            <TaxCode>Nor</TaxCode>
+            <TaxPercentage>21</TaxPercentage>
+          </Tax>
+          <SettlementAmount>0</SettlementAmount>
+        </Line>
+        <Line>
+          <LineNumber>2</LineNumber>
+          <ProductCode>PR 720C</ProductCode>
+          <ProductDescription>Impressora Jet 720C</ProductDescription>
+          <Quantity>1</Quantity>
+          <UnitOfMeasure>Unid</UnitOfMeasure>
+          <UnitPrice>130</UnitPrice>
+          <TaxPointDate>2007-01-24</TaxPointDate>
+          <Description>Impressora Jet 720C</Description>
+          <DebitAmount>0</DebitAmount>
+          <CreditAmount>130</CreditAmount>
+          <Tax>
+            <TaxType>IVACON</TaxType>
+            <TaxCode>Nor</TaxCode>
+            <TaxPercentage>21</TaxPercentage>
+          </Tax>
+          <SettlementAmount>0</SettlementAmount>
+        </Line>
+        <DocumentTotals>
+          <TaxPayable>128.64</TaxPayable>
+          <NetTotal>612.59</NetTotal>
+          <GrossTotal>741.23</GrossTotal>
+        </DocumentTotals>
+      </Invoice>
+      <Invoice>
+        <InvoiceNo>NFa 2</InvoiceNo>
+        <Period>9</Period>
+        <InvoiceDate>2007-09-28</InvoiceDate>
+        <InvoiceType>Factura</InvoiceType>
+        <SystemEntryDate>2007-09-28T15:31:21</SystemEntryDate>
+        <TransactionID></TransactionID>
+        <CustomerID>987654321</CustomerID>
+        <Line>
+          <LineNumber>1</LineNumber>
+          <ProductCode>OT Canetas</ProductCode>
+          <ProductDescription>Canetas</ProductDescription>
+          <Quantity>2</Quantity>
+          <UnitOfMeasure>Unid</UnitOfMeasure>
+          <UnitPrice>1.35</UnitPrice>
+          <TaxPointDate>2007-09-28</TaxPointDate>
+          <Description>Canetas</Description>
+          <DebitAmount>0</DebitAmount>
+          <CreditAmount>2.7</CreditAmount>
+          <Tax>
+            <TaxType>IVACON</TaxType>
+            <TaxCode>Nor</TaxCode><TaxPercentageX>21</TaxPercentageX>
+          </Tax>
+          <SettlementAmount>0</SettlementAmount>
+        </Line>
+        <DocumentTotals>
+          <TaxPayable>.57</TaxPayable>
+          <NetTotal>2.7</NetTotal>
+          <GrossTotal>3.27</GrossTotal>
+        </DocumentTotals>
+      </Invoice>
+    </SalesInvoices>
+  </SourceDocuments>
+</AuditFile>
