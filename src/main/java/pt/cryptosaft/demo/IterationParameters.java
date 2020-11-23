@@ -14,6 +14,7 @@ public class IterationParameters {
 	private boolean notCiphered = false;
 	private int previousElementEnd = 0;
 	private int startElementOffset = 0;
+	private boolean hasText = false;
 
 	String getCurrentBranch() {
 		StringBuffer branch = new StringBuffer();
@@ -90,4 +91,11 @@ public class IterationParameters {
 		this.startElementOffset = startElementOffset;
 	}
 
+	public boolean isHasText() {
+		return hasText;
+	}
+
+	public void setHasText(boolean hasText) {
+		this.hasText = hasText;
+	}
 }

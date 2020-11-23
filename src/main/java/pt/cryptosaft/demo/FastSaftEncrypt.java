@@ -35,7 +35,7 @@ public class FastSaftEncrypt {
 
 	private static final String CIPHER_ALG = "AES/CTR/NoPadding";
 	private static final String KEY_TYPE = "AES";
-	private static final Charset CHARSET = StandardCharsets.ISO_8859_1;
+	private static Charset CHARSET = StandardCharsets.ISO_8859_1;
 
 	private static String input = null;
 	private static String output = null;
@@ -79,11 +79,13 @@ public class FastSaftEncrypt {
 
 		XMLStreamReader xmlr = null;
 
+
 		try (InputStream targetStream = new FileInputStream(new File(input));
 				Reader reader = readerInitialization(input, CHARSET);
 				FileWriter writer = writerInitialization(output, CHARSET);) {
 
-			xmlr = xmlif.createXMLStreamReader(targetStream);
+			xmlr = xmlif.createXMLStreamReader(targetStream, CHARSET.name());
+
 
 			IterationParameters iParam = new IterationParameters();
 
@@ -116,30 +118,27 @@ public class FastSaftEncrypt {
 	private static IterationParameters processEvent(XMLStreamReader xmlr, Reader reader, FileWriter writer,
 			Cipher cipher, IterationParameters iParam) throws IOException, XMLStreamException {
 
-//		System.out.println("EVENT:[" + xmlr.getLocation().getLineNumber() + "][" + xmlr.getLocation().getColumnNumber()
-//				+ "] " + xmlr.getEventType());
+		/*System.out.println("EVENT:[" + xmlr.getLocation().getLineNumber() + "][" + xmlr.getLocation().getColumnNumber()
+				+ "] " + xmlr.getEventType());*/
 		try {
 			switch (xmlr.getEventType()) {
 
 			case XMLStreamConstants.START_ELEMENT:
 				iParam.setNotCiphered(false);
+				iParam.setHasText(false);
 				if (xmlr.hasName()) {
 
-					/*
-					 * System.out.println("\n\nSTART_ELEMENT=Line:" +
-					 * xmlr.getLocation().getLineNumber() + ",Column:" +
-					 * xmlr.getLocation().getColumnNumber() + ",Offset:" +
-					 * xmlr.getLocation().getCharacterOffset() + " LocalName -> "+
-					 * xmlr.getLocalName());
-					 */
+				    /*System.out.println("\n\nSTART_ELEMENT=Line:" +
+					  xmlr.getLocation().getLineNumber() + ",Column:" +
+					  xmlr.getLocation().getColumnNumber() + ",Offset:" +
+					  xmlr.getLocation().getCharacterOffset() + " LocalName -> "+
+					  xmlr.getLocalName());
+*/
 					iParam.getTree().add(xmlr.getLocalName());
 
-					// System.out.println(iParam.getCurrentBranch());
-
+					//System.out.println(iParam.getCurrentBranch());
 					iParam.setElementToCipher(elementsToCypher.contains(iParam.getCurrentBranch()));
-
 					iParam.setElementToCipher(true);
-
 				}
 
 				writeToOutput(xmlr, reader, writer, iParam);
@@ -148,9 +147,9 @@ public class FastSaftEncrypt {
 				break;
 
 			case XMLStreamConstants.CHARACTERS:
-
-				if (xmlr.getTextCharacters().length > 0) {
-
+				if (xmlr.getText().length() > 0) {
+//					System.out.println("CHARACTERS EVENT - Text Characters -> "+xmlr.getTextCharacters().toString());
+					iParam.setHasText(true);
 					writeToOutput(xmlr, reader, writer, iParam);
 
 					if (iParam.isElementToCipher()) {
@@ -162,23 +161,27 @@ public class FastSaftEncrypt {
 			case XMLStreamConstants.END_ELEMENT:
 				if (iParam.isElementToCipher()) {
 
-					// System.out.println("END_ELEMENT=Line:" + xmlr.getLocation().getLineNumber() +
-					// ",Column:"
-					// + xmlr.getLocation().getColumnNumber() + ",Offset:" +
-					// xmlr.getLocation().getCharacterOffset()+ " LocalName -> "+
-					// xmlr.getLocalName());
+					 /*System.out.println("END_ELEMENT=Line:" + xmlr.getLocation().getLineNumber() +
+					 ",Column:"
+					 + xmlr.getLocation().getColumnNumber() + ",Offset:" +
+					 xmlr.getLocation().getCharacterOffset()+ " LocalName -> "+
+					 xmlr.getLocalName() + " Start Element Offset " + iParam.getStartElementOffset() +
+							 " RealValue Length " + iParam.getValueLenght()
+					 );
 
-//				    System.out.println("branch: " + iParam.getCurrentBranch());
+				    System.out.println("branch: " + iParam.getCurrentBranch());*/
 
 					iParam.setValueEnd(xmlr.getLocation().getCharacterOffset());
 
-					if (iParam.getStartElementOffset() == xmlr.getLocation().getCharacterOffset()) {
-						iParam.setValueStart(iParam.getPreviousElementEnd());
+					if (iParam.getStartElementOffset() == xmlr.getLocation().getCharacterOffset() || !iParam.isHasText() ) {
+						if(iParam.getPreviousElementEnd() >0 && iParam.getPreviousElementEnd() >= iParam.getValueStart()) {
+							iParam.setValueStart(iParam.getPreviousElementEnd());
+						}
 						iParam.setNotCiphered(true);
 					}
 
 					int realValueLenght = iParam.getValueLenght();
-					if (realValueLenght != 0) {
+					if (realValueLenght > 0) {
 						char[] cbuf = new char[realValueLenght];
 						int len = reader.read(cbuf);
 
@@ -192,10 +195,9 @@ public class FastSaftEncrypt {
 						}
 
 						iParam.setNextOffset(iParam.getNextOffset() + realValueLenght);
+						//System.out.println(" Value Real -> "+ valueReal+"\n\n");
 						writer.write(valueReal);
-
 					}
-
 				}
 
 				iParam.getTree().removeLast();
