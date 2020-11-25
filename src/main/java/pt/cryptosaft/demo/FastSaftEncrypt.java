@@ -137,8 +137,11 @@ public class FastSaftEncrypt {
 					iParam.getTree().add(xmlr.getLocalName());
 
 					//System.out.println(iParam.getCurrentBranch());
-					iParam.setElementToCipher(elementsToCypher.contains(iParam.getCurrentBranch()));
-					iParam.setElementToCipher(true);
+				        
+					if (elementsToCypher.contains(iParam.getCurrentBranch())) {
+						iParam.setElementToCipher(elementsToCypher.contains(iParam.getCurrentBranch()));
+						iParam.setElementToCipher(true);
+					}	
 				}
 
 				writeToOutput(xmlr, reader, writer, iParam);
