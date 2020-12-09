@@ -20,11 +20,6 @@ A cifra usada nesta demo é AES/CTR/NoPadding com uma chave de 128 bits e um vet
 
 Neste momento, todas as tags com valores estão a ser cifradas.
 
-### TO-DO
-
-- Implementar a lista de elementos a cifrar conforme está do decreto de lei.
-- Integrar o calculo da hash.
-
 ### Instalação
 
 `mvn clean install`
@@ -62,11 +57,6 @@ Esta ferramenta está escrita em Java e utiliza a implementação STAXX da bibli
 Esta biblioteca vai processando o ficheiro XML em stream e lançando eventos que são usados para gerar o formato canonizado do xml.
 
 Este ficheiro canonizado é depois usado para calcular a hash usando SHA-256.
-
-### TO-DO
-
-- Enviar a hash calculada para a saída do executável.
-- Apagar o ficheiro canonizado no final da operação.
 
 ### Execução
 
