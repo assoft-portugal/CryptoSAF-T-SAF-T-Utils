@@ -15,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
@@ -22,17 +24,22 @@ import java.util.HashSet;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.codehaus.stax2.XMLInputFactory2;
 
 public class FastSaftEncrypt {
 
+	// 
+	// This algo is using the AES-ECB with a counter to implement AES-CTR. 
+	// These two variables isn't used for now.
+	//
 	private static final String CIPHER_ALG = "AES/CTR/NoPadding";
 	private static final String KEY_TYPE = "AES";
 	private static Charset CHARSET = StandardCharsets.ISO_8859_1;
@@ -44,60 +51,50 @@ public class FastSaftEncrypt {
 	private static String ivB64 = null;
 
 	private static HashSet<String> elementsToCypher = new HashSet<String>(Arrays.asList(
-		"AuditFile/MasterFiles/GeneralLedgerAccounts/Account/AccountDescription/", 
-		"AuditFile/MasterFiles/Customer/CustomerTaxID/",
-		"AuditFile/MasterFiles/Customer/CompanyName/",
-		"AuditFile/MasterFiles/Customer/Contact/",
-		"AuditFile/MasterFiles/Customer/BillingAddress/BuildingNumber/",
-		"AuditFile/MasterFiles/Customer/BillingAddress/StreetName/",
-		"AuditFile/MasterFiles/Customer/BillingAddress/AddressDetail/",
-		"AuditFile/MasterFiles/Customer/BillingAddress/City/",
-		"AuditFile/MasterFiles/Customer/BillingAddress/PostalCode/",
-		"AuditFile/MasterFiles/Customer/BillingAddress/Region/",
-		"AuditFile/MasterFiles/Customer/BillingAddress/Country/",
-		"AuditFile/MasterFiles/Customer/ShipToAddress/BuildingNumber/",
-		"AuditFile/MasterFiles/Customer/ShipToAddress/StreetName/",
-		"AuditFile/MasterFiles/Customer/ShipToAddress/AddressDetail/",
-		"AuditFile/MasterFiles/Customer/ShipToAddress/City/",
-		"AuditFile/MasterFiles/Customer/ShipToAddress/PostalCode/",
-		"AuditFile/MasterFiles/Customer/ShipToAddress/Region/",
-		"AuditFile/MasterFiles/Customer/ShipToAddress/Country/",
-		"AuditFile/MasterFiles/Customer/Telephone/",
-		"AuditFile/MasterFiles/Customer/Fax/",
-		"AuditFile/MasterFiles/Customer/Email/",
-		"AuditFile/MasterFiles/Customer/Website/",
-		"AuditFile/MasterFiles/Supplier/SupplierTaxID/",
-		"AuditFile/MasterFiles/Supplier/CompanyName/",
-		"AuditFile/MasterFiles/Supplier/Contact/",
-		"AuditFile/MasterFiles/Supplier/BillingAddress/BuildingNumber/",
-		"AuditFile/MasterFiles/Supplier/BillingAddress/StreetName/",
-		"AuditFile/MasterFiles/Supplier/BillingAddress/AddressDetail/",
-		"AuditFile/MasterFiles/Supplier/BillingAddress/City/",
-		"AuditFile/MasterFiles/Supplier/BillingAddress/PostalCode/",
-		"AuditFile/MasterFiles/Supplier/BillingAddress/Region/",
-		"AuditFile/MasterFiles/Supplier/BillingAddress/Country/",
-		"AuditFile/MasterFiles/Supplier/ShipFromAddress/BuildingNumber/",
-		"AuditFile/MasterFiles/Supplier/ShipFromAddress/StreetName/",
-		"AuditFile/MasterFiles/Supplier/ShipFromAddress/AddressDetail/",
-		"AuditFile/MasterFiles/Supplier/ShipFromAddress/City/",
-		"AuditFile/MasterFiles/Supplier/ShipFromAddress/PostalCode/",
-		"AuditFile/MasterFiles/Supplier/ShipFromAddress/Region/",
-		"AuditFile/MasterFiles/Supplier/ShipFromAddress/Country/",
-		"AuditFile/MasterFiles/Supplier/Telephone/",
-		"AuditFile/MasterFiles/Supplier/Fax/",
-		"AuditFile/MasterFiles/Supplier/Email/",
-		"AuditFile/MasterFiles/Supplier/Website/",
-		"AuditFile/MasterFiles/TaxTable/TaxTableEntry/Description/",
-		"AuditFile/GeneralLedgerEntries/Journal/Description/",
-		"AuditFile/GeneralLedgerEntries/Journal/Transaction/SourceID/",
-		"AuditFile/GeneralLedgerEntries/Journal/Transaction/Description/",
-		"AuditFile/GeneralLedgerEntries/Journal/Transaction/Lines/DebitLine/Description/",
-		"AuditFile/GeneralLedgerEntries/Journal/Transaction/Lines/CreditLine/Description/",
-		"AuditFile/SourceDocuments/Payments/Payment/Description/",
-		"AuditFile/SourceDocuments/Payments/Payment/DocumentStatus/SourceID/",
-		"AuditFile/SourceDocuments/Payments/Payment/SourceID/",
-		"AuditFile/SourceDocuments/Payments/Payment/Line/SourceDocumentID/Description/"
-	));
+			"AuditFile/MasterFiles/GeneralLedgerAccounts/Account/AccountDescription/",
+			"AuditFile/MasterFiles/Customer/CustomerTaxID/", "AuditFile/MasterFiles/Customer/CompanyName/",
+			"AuditFile/MasterFiles/Customer/Contact/", "AuditFile/MasterFiles/Customer/BillingAddress/BuildingNumber/",
+			"AuditFile/MasterFiles/Customer/BillingAddress/StreetName/",
+			"AuditFile/MasterFiles/Customer/BillingAddress/AddressDetail/",
+			"AuditFile/MasterFiles/Customer/BillingAddress/City/",
+			"AuditFile/MasterFiles/Customer/BillingAddress/PostalCode/",
+			"AuditFile/MasterFiles/Customer/BillingAddress/Region/",
+			"AuditFile/MasterFiles/Customer/BillingAddress/Country/",
+			"AuditFile/MasterFiles/Customer/ShipToAddress/BuildingNumber/",
+			"AuditFile/MasterFiles/Customer/ShipToAddress/StreetName/",
+			"AuditFile/MasterFiles/Customer/ShipToAddress/AddressDetail/",
+			"AuditFile/MasterFiles/Customer/ShipToAddress/City/",
+			"AuditFile/MasterFiles/Customer/ShipToAddress/PostalCode/",
+			"AuditFile/MasterFiles/Customer/ShipToAddress/Region/",
+			"AuditFile/MasterFiles/Customer/ShipToAddress/Country/", "AuditFile/MasterFiles/Customer/Telephone/",
+			"AuditFile/MasterFiles/Customer/Fax/", "AuditFile/MasterFiles/Customer/Email/",
+			"AuditFile/MasterFiles/Customer/Website/", "AuditFile/MasterFiles/Supplier/SupplierTaxID/",
+			"AuditFile/MasterFiles/Supplier/CompanyName/", "AuditFile/MasterFiles/Supplier/Contact/",
+			"AuditFile/MasterFiles/Supplier/BillingAddress/BuildingNumber/",
+			"AuditFile/MasterFiles/Supplier/BillingAddress/StreetName/",
+			"AuditFile/MasterFiles/Supplier/BillingAddress/AddressDetail/",
+			"AuditFile/MasterFiles/Supplier/BillingAddress/City/",
+			"AuditFile/MasterFiles/Supplier/BillingAddress/PostalCode/",
+			"AuditFile/MasterFiles/Supplier/BillingAddress/Region/",
+			"AuditFile/MasterFiles/Supplier/BillingAddress/Country/",
+			"AuditFile/MasterFiles/Supplier/ShipFromAddress/BuildingNumber/",
+			"AuditFile/MasterFiles/Supplier/ShipFromAddress/StreetName/",
+			"AuditFile/MasterFiles/Supplier/ShipFromAddress/AddressDetail/",
+			"AuditFile/MasterFiles/Supplier/ShipFromAddress/City/",
+			"AuditFile/MasterFiles/Supplier/ShipFromAddress/PostalCode/",
+			"AuditFile/MasterFiles/Supplier/ShipFromAddress/Region/",
+			"AuditFile/MasterFiles/Supplier/ShipFromAddress/Country/", "AuditFile/MasterFiles/Supplier/Telephone/",
+			"AuditFile/MasterFiles/Supplier/Fax/", "AuditFile/MasterFiles/Supplier/Email/",
+			"AuditFile/MasterFiles/Supplier/Website/", "AuditFile/MasterFiles/TaxTable/TaxTableEntry/Description/",
+			"AuditFile/GeneralLedgerEntries/Journal/Description/",
+			"AuditFile/GeneralLedgerEntries/Journal/Transaction/SourceID/",
+			"AuditFile/GeneralLedgerEntries/Journal/Transaction/Description/",
+			"AuditFile/GeneralLedgerEntries/Journal/Transaction/Lines/DebitLine/Description/",
+			"AuditFile/GeneralLedgerEntries/Journal/Transaction/Lines/CreditLine/Description/",
+			"AuditFile/SourceDocuments/Payments/Payment/Description/",
+			"AuditFile/SourceDocuments/Payments/Payment/DocumentStatus/SourceID/",
+			"AuditFile/SourceDocuments/Payments/Payment/SourceID/",
+			"AuditFile/SourceDocuments/Payments/Payment/Line/SourceDocumentID/Description/"));
 
 	private static void printUsage() {
 		System.out.println(
@@ -127,19 +124,17 @@ public class FastSaftEncrypt {
 			System.exit(0);
 		}
 
-		Cipher cipher = cipherInitialization();
+		AESStreamCipher cipher = cipherInitialization();
 
 		XMLInputFactory2 xmlif = staxFactoryInitialization(input);
 
 		XMLStreamReader xmlr = null;
-
 
 		try (InputStream targetStream = new FileInputStream(new File(input));
 				Reader reader = readerInitialization(input, CHARSET);
 				FileWriter writer = writerInitialization(output, CHARSET);) {
 
 			xmlr = xmlif.createXMLStreamReader(targetStream, CHARSET.name());
-
 
 			IterationParameters iParam = new IterationParameters();
 
@@ -170,101 +165,108 @@ public class FastSaftEncrypt {
 	}
 
 	private static IterationParameters processEvent(XMLStreamReader xmlr, Reader reader, FileWriter writer,
-			Cipher cipher, IterationParameters iParam) throws IOException, XMLStreamException {
+			AESStreamCipher cipher, IterationParameters iParam) throws IOException, XMLStreamException {
 
-		/*System.out.println("EVENT:[" + xmlr.getLocation().getLineNumber() + "][" + xmlr.getLocation().getColumnNumber()
-				+ "] " + xmlr.getEventType());*/
+		/*
+		 * System.out.println("EVENT:[" + xmlr.getLocation().getLineNumber() + "][" +
+		 * xmlr.getLocation().getColumnNumber() + "] " + xmlr.getEventType());
+		 */
 		try {
 			switch (xmlr.getEventType()) {
 
-			case XMLStreamConstants.START_ELEMENT:
-				iParam.setNotCiphered(false);
-				iParam.setHasText(false);
-				if (xmlr.hasName()) {
+				case XMLStreamConstants.START_ELEMENT:
+					iParam.setNotCiphered(false);
+					iParam.setHasText(false);
+					if (xmlr.hasName()) {
 
-				    /*System.out.println("\n\nSTART_ELEMENT=Line:" +
-					  xmlr.getLocation().getLineNumber() + ",Column:" +
-					  xmlr.getLocation().getColumnNumber() + ",Offset:" +
-					  xmlr.getLocation().getCharacterOffset() + " LocalName -> "+
-					  xmlr.getLocalName());
-*/
-					iParam.getTree().add(xmlr.getLocalName());
+						/*
+						 * System.out.println("\n\nSTART_ELEMENT=Line:" +
+						 * xmlr.getLocation().getLineNumber() + ",Column:" +
+						 * xmlr.getLocation().getColumnNumber() + ",Offset:" +
+						 * xmlr.getLocation().getCharacterOffset() + " LocalName -> "+
+						 * xmlr.getLocalName());
+						 */
+						iParam.getTree().add(xmlr.getLocalName());
 
-					//System.out.println(iParam.getCurrentBranch());
-				        
-					if (elementsToCypher.contains(iParam.getCurrentBranch())) {
-						iParam.setElementToCipher(elementsToCypher.contains(iParam.getCurrentBranch()));
-						iParam.setElementToCipher(true);
-					}	
-				}
+						// System.out.println(iParam.getCurrentBranch());
 
-				writeToOutput(xmlr, reader, writer, iParam);
-				iParam.setStartElementOffset(xmlr.getLocation().getCharacterOffset());
+						if (elementsToCypher.contains(iParam.getCurrentBranch())) {
+							iParam.setElementToCipher(elementsToCypher.contains(iParam.getCurrentBranch()));
+							iParam.setElementToCipher(true);
+						}
+					}
 
-				break;
-
-			case XMLStreamConstants.CHARACTERS:
-				if (xmlr.getText().length() > 0) {
-//					System.out.println("CHARACTERS EVENT - Text Characters -> "+xmlr.getTextCharacters().toString());
-					iParam.setHasText(true);
 					writeToOutput(xmlr, reader, writer, iParam);
+					iParam.setStartElementOffset(xmlr.getLocation().getCharacterOffset());
 
+					break;
+
+				case XMLStreamConstants.CHARACTERS:
+					if (xmlr.getText().length() > 0) {
+						// System.out.println("CHARACTERS EVENT - Text Characters ->
+						// "+xmlr.getTextCharacters().toString());
+						iParam.setHasText(true);
+						writeToOutput(xmlr, reader, writer, iParam);
+
+						if (iParam.isElementToCipher()) {
+							iParam.setValueStart(xmlr.getLocation().getCharacterOffset());
+						}
+					}
+					break;
+
+				case XMLStreamConstants.END_ELEMENT:
 					if (iParam.isElementToCipher()) {
-						iParam.setValueStart(xmlr.getLocation().getCharacterOffset());
-					}
-				}
-				break;
 
-			case XMLStreamConstants.END_ELEMENT:
-				if (iParam.isElementToCipher()) {
+						/*
+						 * System.out.println("END_ELEMENT=Line:" + xmlr.getLocation().getLineNumber() +
+						 * ",Column:" + xmlr.getLocation().getColumnNumber() + ",Offset:" +
+						 * xmlr.getLocation().getCharacterOffset()+ " LocalName -> "+
+						 * xmlr.getLocalName() + " Start Element Offset " +
+						 * iParam.getStartElementOffset() + " RealValue Length " +
+						 * iParam.getValueLenght() );
+						 * 
+						 * System.out.println("branch: " + iParam.getCurrentBranch());
+						 */
 
-					 /*System.out.println("END_ELEMENT=Line:" + xmlr.getLocation().getLineNumber() +
-					 ",Column:"
-					 + xmlr.getLocation().getColumnNumber() + ",Offset:" +
-					 xmlr.getLocation().getCharacterOffset()+ " LocalName -> "+
-					 xmlr.getLocalName() + " Start Element Offset " + iParam.getStartElementOffset() +
-							 " RealValue Length " + iParam.getValueLenght()
-					 );
+						iParam.setValueEnd(xmlr.getLocation().getCharacterOffset());
 
-				    System.out.println("branch: " + iParam.getCurrentBranch());*/
-
-					iParam.setValueEnd(xmlr.getLocation().getCharacterOffset());
-
-					if (iParam.getStartElementOffset() == xmlr.getLocation().getCharacterOffset() || !iParam.isHasText() ) {
-						if(iParam.getPreviousElementEnd() >0 && iParam.getPreviousElementEnd() >= iParam.getValueStart()) {
-							iParam.setValueStart(iParam.getPreviousElementEnd());
-						}
-						iParam.setNotCiphered(true);
-					}
-
-					int realValueLenght = iParam.getValueLenght();
-					if (realValueLenght > 0) {
-						char[] cbuf = new char[realValueLenght];
-						int len = reader.read(cbuf);
-
-						String valueReal = new String(cbuf);
-						if (!iParam.isNotCiphered()) {
-							if (cipherOper) {
-								valueReal = cipher(cipher, valueReal);
-							} else {
-								valueReal = decipher(cipher, valueReal);
+						if (iParam.getStartElementOffset() == xmlr.getLocation().getCharacterOffset()
+								|| !iParam.isHasText()) {
+							if (iParam.getPreviousElementEnd() > 0
+									&& iParam.getPreviousElementEnd() >= iParam.getValueStart()) {
+								iParam.setValueStart(iParam.getPreviousElementEnd());
 							}
+							iParam.setNotCiphered(true);
 						}
 
-						iParam.setNextOffset(iParam.getNextOffset() + realValueLenght);
-						//System.out.println(" Value Real -> "+ valueReal+"\n\n");
-						writer.write(valueReal);
+						int realValueLenght = iParam.getValueLenght();
+						if (realValueLenght > 0) {
+							char[] cbuf = new char[realValueLenght];
+							int len = reader.read(cbuf);
+
+							String valueReal = new String(cbuf);
+							if (!iParam.isNotCiphered()) {
+								if (cipherOper) {
+									valueReal = cipher(cipher, valueReal);
+								} else {
+									valueReal = decipher(cipher, valueReal);
+								}
+							}
+
+							iParam.setNextOffset(iParam.getNextOffset() + realValueLenght);
+							// System.out.println(" Value Real -> "+ valueReal+"\n\n");
+							writer.write(valueReal);
+						}
 					}
-				}
 
-				iParam.getTree().removeLast();
-				iParam.setElementToCipher(false);
-				iParam.setPreviousElementEnd(iParam.getNextOffset());
+					iParam.getTree().removeLast();
+					iParam.setElementToCipher(false);
+					iParam.setPreviousElementEnd(iParam.getNextOffset());
 
-				break;
+					break;
 
-			default:
-				// System.out.println("skip");
+				default:
+					// System.out.println("skip");
 
 			}
 		} catch (Exception e) {
@@ -294,7 +296,7 @@ public class FastSaftEncrypt {
 		//
 		XMLInputFactory2 xmlif = (XMLInputFactory2) XMLInputFactory2.newInstance();
 
-//		xmlif.setProperty(XMLInputFactory2.P_PRESERVE_LOCATION, Boolean.TRUE);
+		// xmlif.setProperty(XMLInputFactory2.P_PRESERVE_LOCATION, Boolean.TRUE);
 
 		xmlif.configureForConvenience();
 
@@ -303,24 +305,19 @@ public class FastSaftEncrypt {
 		return xmlif;
 	}
 
-	private static Cipher cipherInitialization() throws NoSuchAlgorithmException, NoSuchPaddingException,
-			InvalidKeyException, InvalidAlgorithmParameterException {
-		// AES_CTR::
+	private static AESStreamCipher cipherInitialization() throws NoSuchAlgorithmException, NoSuchPaddingException,
+			InvalidKeyException, InvalidAlgorithmParameterException, NoSuchProviderException {
+		Security.addProvider(new BouncyCastleProvider());
+
+		AESStreamCipher cipher = new AESStreamCipher(Cipher.getInstance("AES/ECB/NoPadding", "BC"));
+
 		byte[] keyBytes = Base64.getDecoder().decode(keyB64);
-		SecretKey key = new SecretKeySpec(keyBytes, KEY_TYPE);
-		Cipher cipher = Cipher.getInstance(CIPHER_ALG);
-		byte[] iv = Base64.getDecoder().decode(ivB64);
-		IvParameterSpec paramSpec = new IvParameterSpec(iv);
-		SecretKeySpec keySpec = new SecretKeySpec(key.getEncoded(), KEY_TYPE);
 
-		int mode;
-		if (cipherOper) {
-			mode = Cipher.ENCRYPT_MODE;
-		} else {
-			mode = Cipher.DECRYPT_MODE;
-		}
+		byte[] ivBytes = Base64.getDecoder().decode(ivB64);
 
-		cipher.init(mode, keySpec, paramSpec);
+		SecretKey secKey = new SecretKeySpec(keyBytes, "AES");
+		cipher.init(!cipherOper, secKey, ivBytes);
+
 		return cipher;
 	}
 
@@ -352,16 +349,20 @@ public class FastSaftEncrypt {
 		}
 	}
 
-	private static String cipher(Cipher cipher, String text) throws UnsupportedEncodingException {
-		byte[] cipherTextBytes = cipher.update(text.getBytes(CHARSET));
+	private static String cipher(AESStreamCipher cipher, String text)
+			throws UnsupportedEncodingException, ShortBufferException {
+		byte[] textBytes = text.getBytes(CHARSET);
+		byte[] cipherTextBytes = new byte[textBytes.length];
+		cipher.encrypt(textBytes, cipherTextBytes);
 		String cipherTextString = Base64.getEncoder().encodeToString(cipherTextBytes);
 		return cipherTextString;
 	}
 
-	private static String decipher(Cipher cipher, String text) throws UnsupportedEncodingException {
-
+	private static String decipher(AESStreamCipher cipher, String text)
+			throws UnsupportedEncodingException, ShortBufferException {
 		byte[] cipherTextBytes = Base64.getDecoder().decode(text);
-		byte[] decipheredBytes = cipher.update(cipherTextBytes);
+		byte[] decipheredBytes = new byte[cipherTextBytes.length];
+		cipher.encrypt(cipherTextBytes, decipheredBytes);
 		String decipherTextString = new String(decipheredBytes, CHARSET);
 		return decipherTextString;
 
