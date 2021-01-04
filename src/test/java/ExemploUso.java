@@ -43,7 +43,7 @@ public class ExemploUso {
 
 		// Calculo dos dados cifrados usando a implementação AES Stream Cipher
 		// Usa como base a implementação da cifra AES-ECB do BouncyCastle
-		AESCTRStreamCipher aesctr = new AESCTRStreamCipher(Cipher.getInstance("AES/ECB/NoPadding", "BC"));
+		AESStreamCipher aesctr = new AESStreamCipher(Cipher.getInstance("AES/ECB/NoPadding", "BC"));
 
 		SecretKey secKey = new SecretKeySpec(keyBytes, "AES");
 		aesctr.init(false, secKey, ivBytes);
